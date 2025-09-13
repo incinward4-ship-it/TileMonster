@@ -1,0 +1,98 @@
+
+:root {
+  --color-accent-yellow: #f7c84c;
+}
+
+body {
+  background-color: #f0f0f0;
+  color: #222222;
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+}
+
+.App {
+  background: #f0f0f0;
+  color: #222222;
+}
+
+.texture-creator, .export-section {
+  filter: grayscale(100%);
+}
+
+.preview-section,
+.sandbox {
+  filter: none !important;
+}
+
+.App-main {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 24px;
+  padding: 32px;
+  height: 100vh;
+}
+
+.texture-creator {
+  background-color: #d3d3d3; /* light gray */
+  border: 2px solid #444444; /* dark gray border */
+  border-radius: 8px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.sandbox {
+  background-color: #333333; /* flat dark gray */
+  border-radius: 12px;
+  padding: 8px;
+  box-sizing: border-box;
+  border: none; /* no border by default */
+}
+
+.sandbox-grid {
+    display: grid;
+    grid-template-columns: repeat(32, 25px);
+    grid-template-rows: repeat(32, 25px);
+}
+
+.grid-cell {
+  border: 1px solid #555555; /* subtle gray border */
+  width: 25px;
+  height: 25px;
+  box-sizing: border-box;
+}
+
+.sandbox-grid.no-grid .grid-cell {
+  border: none !important;
+}
+
+.single-tile {
+  width: 25px !important;
+  height: 25px !important;
+  border: 2px solid #444444 !important;
+  border-radius: 8px !important;
+  background-color: #d3d3d3 !important;
+  box-sizing: border-box;
+  margin-bottom: 16px;
+}
+
+
+button {
+  filter: none;
+  background-color: #f7c84c;
+  color: #1a1f36;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.15s ease;
+  width: 100%;
+  text-align: center;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+}
+
+button:hover {
+  background-color: #f4b942;
+  transform: scale(1.05);
+}
