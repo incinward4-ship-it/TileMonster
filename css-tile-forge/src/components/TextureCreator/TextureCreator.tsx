@@ -1,12 +1,13 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import AttributePanel from '../AttributePanel/AttributePanel';
-import Preview from '../Preview/Preview';
 import { CSS_ATTRIBUTES, CssAttribute } from '../../data/css-attributes';
 import { ActiveAttribute, TileStyle } from '../../data/types';
 
 interface TextureCreatorProps {
   saveToPalette: (style: TileStyle) => void;
+  activeAttributes: ActiveAttribute[];
+  setActiveAttributes: React.Dispatch<React.SetStateAction<ActiveAttribute[]>>;
 }
 
 // --- Helper functions for randomization ---
@@ -40,90 +41,7 @@ const generateRandomValueFor = (definition: CssAttribute): any => {
 };
 // --- End of Randomization Helpers ---
 
-const defaultTileStyle: TileStyle = {
-  backgroundColor: '#d3d3d3', // light gray
-  border: '2px solid darkgrey',
-  borderRadius: '8px',
-};
-
-const TextureCreator: React.FC<TextureCreatorProps> = ({ saveToPalette }) => {
-  const [activeAttributes, setActiveAttributes] = useState<ActiveAttribute[]>([]);
-  const [tileStyles, setTileStyles] = useState<TileStyle>(defaultTileStyle);
-  const [isBlendMode, setIsBlendMode] = useState<boolean>(false);
-
-  useEffect(() => {
-    const newStyles: React.CSSProperties = {};
-    const gradients: string[] = [];
-    const filters: string[] = [];
-    const transforms: string[] = [];
-
-    if (activeAttributes.length === 0) {
-        setTileStyles(defaultTileStyle);
-        return;
-    }
-
-    activeAttributes.forEach(({ definition, value }) => {
-      switch (definition.id) {
-        case 'backgroundColor':
-          newStyles.backgroundColor = value;
-          break;
-        case 'backgroundPosition': newStyles.backgroundPosition = value; break;
-        case 'backgroundSize': newStyles.backgroundSize = value; break;
-        case 'backgroundRepeat': newStyles.backgroundRepeat = value; break;
-        case 'borderRadius': newStyles.borderRadius = `${value}px`; break;
-        case 'clipPath': newStyles.clipPath = value; break;
-
-        case 'border':
-          newStyles.border = `${value.width}px ${value.style} ${value.color}`;
-          break;
-        case 'boxShadow':
-          const shadow = `${value.inset ? 'inset ' : ''}${value.offsetX}px ${value.offsetY}px ${value.blurRadius}px ${value.spreadRadius}px ${value.color}`;
-          newStyles.boxShadow = newStyles.boxShadow ? `${newStyles.boxShadow}, ${shadow}` : shadow;
-          break;
-
-        case 'linear-gradient':
-          gradients.push(`linear-gradient(${value.angle}deg, ${value.color1}, ${value.color2})`);
-          break;
-        case 'radial-gradient':
-          gradients.push(`radial-gradient(circle, ${value.color1}, ${value.color2})`);
-          break;
-        case 'filter':
-          Object.keys(value).forEach(key => {
-            const subDef = definition.subAttributes?.find(d => d.id === key);
-            if (subDef && value[key] !== subDef.defaultValue) {
-              const unit = key === 'hueRotate' ? 'deg' : key === 'blur' ? 'px' : '';
-              filters.push(`${key}(${value[key]}${unit})`);
-            }
-          });
-          break;
-        case 'transform':
-            Object.keys(value).forEach(key => {
-                const subDef = definition.subAttributes?.find(d => d.id === key);
-                if (subDef && value[key] !== subDef.defaultValue) {
-                    const unit = key.includes('translate') ? 'px' : key.includes('rotate') ? 'deg' : '';
-                    const transformKey = key.includes('scale') ? key : key.split(/(?=[A-Z])/).join('-').toLowerCase();
-                    transforms.push(`${transformKey}(${value[key]}${unit})`);
-                }
-            });
-            break;
-      }
-    });
-
-    if (gradients.length > 0) newStyles.backgroundImage = gradients.join(', ');
-    if (filters.length > 0) newStyles.filter = filters.join(' ');
-    if (transforms.length > 0) newStyles.transform = transforms.join(' ');
-
-    setTileStyles(newStyles);
-  }, [activeAttributes]);
-
-  const handleSave = () => {
-    const finalStyle: TileStyle = {
-      ...tileStyles,
-      blend: isBlendMode,
-      transform: tileStyles.transform, // Already in tileStyles
-    };
-    saveToPalette(finalStyle);
-  };
+const TextureCreator: React.FC<TextureCreatorProps> = ({ saveToPalette, activeAttributes, setActiveAttributes }) => {
 
   const handleRandomize = () => {
     const newAttributes: ActiveAttribute[] = [];
@@ -148,10 +66,9 @@ const TextureCreator: React.FC<TextureCreatorProps> = ({ saveToPalette }) => {
   return (
     <div className="texture-creator">
       <h2>Texture Creator</h2>
-      <Preview tileStyles={tileStyles} isBlendMode={isBlendMode} onBlendChange={setIsBlendMode} />
       <div className="controls" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <button onClick={handleRandomize}>Randomize</button>
-        <button onClick={handleSave}>Save to Palette</button>
+        <button onClick={() => saveToPalette}>Save to Palette</button>
       </div>
       <AttributePanel attributes={activeAttributes} setAttributes={setActiveAttributes} />
     </div>
