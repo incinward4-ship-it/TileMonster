@@ -1,76 +1,108 @@
 
 import React from 'react';
 import AttributePanel from '../AttributePanel/AttributePanel';
-import { CSS_ATTRIBUTES, CssAttribute } from '../../data/css-attributes';
 import { ActiveAttribute, TileStyle } from '../../data/types';
+import { CSS_ATTRIBUTES } from '../../data/css-attributes';
 
 interface TextureCreatorProps {
   saveToPalette: (style: TileStyle) => void;
   activeAttributes: ActiveAttribute[];
   setActiveAttributes: React.Dispatch<React.SetStateAction<ActiveAttribute[]>>;
+  tileStyles: TileStyle;
 }
 
-// --- Helper functions for randomization ---
-const getRandomColor = () => `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
-
-const getRandomValue = (min: number, max: number, step: number) => {
-  const steps = (max - min) / step;
-  return parseFloat((min + Math.floor(Math.random() * (steps + 1)) * step).toFixed(2));
-};
-
-const generateRandomValueFor = (definition: CssAttribute): any => {
-  switch (definition.controlType) {
-    case 'color':
-      return getRandomColor();
-    case 'slider':
-      return getRandomValue(definition.min!, definition.max!, definition.step!);
-    case 'select':
-      const randomIndex = Math.floor(Math.random() * definition.options!.length);
-      return definition.options![randomIndex].value;
-    case 'checkbox':
-      return Math.random() > 0.5;
-    case 'multi':
-      const multiValue: { [key: string]: any } = {};
-      definition.subAttributes?.forEach(subDef => {
-        multiValue[subDef.id] = generateRandomValueFor(subDef as any);
-      });
-      return multiValue;
-    default:
-      return definition.defaultValue;
-  }
-};
-// --- End of Randomization Helpers ---
-
-const TextureCreator: React.FC<TextureCreatorProps> = ({ saveToPalette, activeAttributes, setActiveAttributes }) => {
+const TextureCreator: React.FC<TextureCreatorProps> = ({
+  saveToPalette,
+  activeAttributes,
+  setActiveAttributes,
+  tileStyles,
+}) => {
 
   const handleRandomize = () => {
-    const newAttributes: ActiveAttribute[] = [];
-    const attrCount = Math.floor(Math.random() * 4) + 2;
-    const availableAttrs = [...CSS_ATTRIBUTES];
+    const presentIds = activeAttributes.map(attr => attr.definition.id);
+    const availableAttrs = CSS_ATTRIBUTES.filter(attr => !presentIds.includes(attr.id) || ['borderTop', 'borderRight', 'borderBottom', 'borderLeft'].includes(attr.id));
+    if (availableAttrs.length === 0) return;
+    const randomAttr = availableAttrs[Math.floor(Math.random() * availableAttrs.length)];
 
-    for (let i = 0; i < attrCount && availableAttrs.length > 0; i++) {
-      const randomIndex = Math.floor(Math.random() * availableAttrs.length);
-      const randomDef = availableAttrs[randomIndex];
-      availableAttrs.splice(randomIndex, 1);
-      if(CSS_ATTRIBUTES.find(a => a.category === 'Background' && a.id !== randomDef.id && newAttributes.some(na => na.definition.category === 'Background'))) continue;
+    const newAttr: ActiveAttribute = {
+      id: `rand-${Date.now()}`,
+      definition: randomAttr,
+      value: randomAttr.defaultValue,
+    };
 
-      newAttributes.push({
-        id: `rand-${Date.now()}-${i}`,
-        definition: randomDef,
-        value: generateRandomValueFor(randomDef),
-      });
+    setActiveAttributes([...activeAttributes, newAttr]);
+  };
+
+  const clearAll = () => setActiveAttributes([]);
+
+  const randomizeAllAttributes = () => {
+    const randomizedAttributes = activeAttributes.map(attr => {
+      const def = CSS_ATTRIBUTES.find(d => d.id === attr.definition.id);
+      if (!def) return attr;
+      return {
+        ...attr,
+        value: generateRandomForAttr(def),
+      };
+    });
+    setActiveAttributes(randomizedAttributes);
+  };
+
+  const randomizeAttribute = (attrId: string) => {
+    const attr = activeAttributes.find(a => a.id === attrId);
+    if (!attr) return;
+    const def = attr.definition;
+    if (!def) return;
+    const randomValue = generateRandomForAttr(def);
+
+    setActiveAttributes(activeAttributes.map(a =>
+      a.id === attrId ? { ...a, value: randomValue } : a
+    ));
+  };
+
+  const generateRandomForAttr = (def: any): any => {
+    const generateRandomColor = () => `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
+    switch (def.controlType) {
+      case 'color':
+        return generateRandomColor();
+      case 'slider':
+        return Math.floor(Math.random() * (def.max - def.min + 1)) + def.min;
+      case 'select':
+        const opts = def.options || [];
+        if (opts.length === 0) return def.defaultValue;
+        return opts[Math.floor(Math.random() * opts.length)].value;
+      case 'checkbox':
+        return Math.random() > 0.5;
+      case 'multi':
+        const multiValue: any = {};
+        def.subAttributes?.forEach((sub: any) => {
+          multiValue[sub.id] = generateRandomForAttr(sub);
+        });
+        return multiValue;
+      case 'gradient':
+        return {
+          type: 'linear',
+          angle: Math.floor(Math.random() * 361),
+          colors: [generateRandomColor(), generateRandomColor()],
+        };
+      default:
+        return def.defaultValue;
     }
-    setActiveAttributes(newAttributes);
   };
 
   return (
     <div className="texture-creator">
       <h2>Texture Creator</h2>
       <div className="controls" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <button onClick={handleRandomize}>Randomize</button>
-        <button onClick={() => saveToPalette}>Save to Palette</button>
+        <button onClick={clearAll}>Clear All</button>
+        <button onClick={handleRandomize}>Randomize One</button>
+        <button onClick={randomizeAllAttributes}>Randomize All</button>
+        <button onClick={() => saveToPalette(tileStyles)}>Save to Palette</button>
       </div>
-      <AttributePanel attributes={activeAttributes} setAttributes={setActiveAttributes} />
+      <AttributePanel
+        attributes={activeAttributes}
+        setAttributes={setActiveAttributes}
+        randomizeAttribute={randomizeAttribute}
+      />
     </div>
   );
 };

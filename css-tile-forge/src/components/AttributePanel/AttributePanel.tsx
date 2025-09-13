@@ -13,6 +13,7 @@ export interface ActiveAttribute {
 interface AttributePanelProps {
   attributes: ActiveAttribute[];
   setAttributes: React.Dispatch<React.SetStateAction<ActiveAttribute[]>>;
+  randomizeAttribute: (id: string) => void;
 }
 
 let nextId = 0;
@@ -25,7 +26,7 @@ const attributeGroups = CSS_ATTRIBUTES.reduce((acc, attr) => {
   return acc;
 }, {} as Record<string, CssAttribute[]>);
 
-const AttributePanel: React.FC<AttributePanelProps> = ({ attributes, setAttributes }) => {
+const AttributePanel: React.FC<AttributePanelProps> = ({ attributes, setAttributes, randomizeAttribute }) => {
 
   const addAttribute = (attributeId: string) => {
     if (!attributeId) return;
@@ -33,6 +34,18 @@ const AttributePanel: React.FC<AttributePanelProps> = ({ attributes, setAttribut
     const definition = CSS_ATTRIBUTES.find(attr => attr.id === attributeId);
     if (!definition) return;
     
+    if (['borderTop', 'borderRight', 'borderBottom', 'borderLeft'].includes(definition.id)) {
+        const newAttribute: ActiveAttribute = {
+          id: getNextId(),
+          definition,
+          value: {
+            ...definition.defaultValue
+          }
+        };
+        setAttributes([...attributes, newAttribute]);
+        return;
+    }
+
     // Prevent adding multiple of certain unique attributes
     if ( (definition.id === 'backgroundColor' || definition.id === 'opacity') && attributes.some(attr => attr.definition.id === definition.id) ) {
       alert(`The ${definition.label} attribute can only be added once.`);
@@ -82,6 +95,7 @@ const AttributePanel: React.FC<AttributePanelProps> = ({ attributes, setAttribut
             attribute={attr}
             onRemove={() => removeAttribute(attr.id)}
             onUpdate={(newValue) => updateAttribute(attr.id, newValue)}
+            randomize={() => randomizeAttribute(attr.id)}
           />
         ))}
       </div>

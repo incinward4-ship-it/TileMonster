@@ -51,15 +51,16 @@ const Preview: React.FC<PreviewProps> = ({ tileStyles, isBlendMode, onBlendChang
   };
 
   return (
-    <div className="preview-section">
+    <div>
         <div className="preview-container">
             <h3>1x1 Tile</h3>
             <div
                 className="preview-tile single-tile"
                 style={{
-                ...tileStyles,
-                width: 25,
-                height: 25,
+                  ...tileStyles,
+                  width: 25,
+                  height: 25,
+                  boxSizing: 'border-box',
                 }} />
         </div>
       <div className="preview-container">

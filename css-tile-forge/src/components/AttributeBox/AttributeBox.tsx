@@ -6,13 +6,28 @@ interface AttributeBoxProps {
   attribute: ActiveAttribute;
   onRemove: () => void;
   onUpdate: (newValue: any) => void;
+  randomize: () => void;
 }
 
 // A helper component to render the correct input control for a given attribute definition
 const AttributeControl: React.FC<{ definition: any, value: any, onChange: (value: any) => void }> = ({ definition, value, onChange }) => {
   switch (definition.controlType) {
     case 'color':
-      return <input type="color" value={value} onChange={(e) => onChange(e.target.value)} />;
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <input type="color" value={value} onChange={(e) => onChange(e.target.value)} />
+            <div
+                className="color-preview"
+                style={{
+                width: '24px',
+                height: '24px',
+                backgroundColor: value || 'transparent',
+                border: '1px solid #999',
+                borderRadius: '4px',
+                }}
+            />
+        </div>
+    );
 
     case 'slider':
       return (
@@ -48,13 +63,25 @@ const AttributeControl: React.FC<{ definition: any, value: any, onChange: (value
             onChange={(e) => onChange(e.target.checked)}
           />
         );
+    case 'gradient':
+        return (
+            <div className="gradient-control">
+                <select value={value.type} onChange={e => onChange({ ...value, type: e.target.value })}>
+                    <option value="linear">Linear</option>
+                    <option value="radial">Radial</option>
+                </select>
+                <input type="number" value={value.angle} onChange={e => onChange({ ...value, angle: parseInt(e.target.value) })} />
+                <input type="color" value={value.colors[0]} onChange={e => onChange({ ...value, colors: [e.target.value, value.colors[1]] })} />
+                <input type="color" value={value.colors[1]} onChange={e => onChange({ ...value, colors: [value.colors[0], e.target.value] })} />
+            </div>
+        )
 
     default:
       return <p>Unsupported Control Type</p>;
   }
 };
 
-const AttributeBox: React.FC<AttributeBoxProps> = ({ attribute, onRemove, onUpdate }) => {
+const AttributeBox: React.FC<AttributeBoxProps> = ({ attribute, onRemove, onUpdate, randomize }) => {
   const { definition, value } = attribute;
 
   const handleSubAttributeChange = (subId: string, subValue: any) => {
@@ -84,7 +111,10 @@ const AttributeBox: React.FC<AttributeBoxProps> = ({ attribute, onRemove, onUpda
     <div className="attribute-box">
       <div className="attribute-box-header">
         <span>{definition.label}</span>
-        <button onClick={onRemove}>X</button>
+        <div>
+            <button onClick={randomize} className="randomize-small-btn">R</button>
+            <button onClick={onRemove}>X</button>
+        </div>
       </div>
       <div className="attribute-box-controls">
         {definition.controlType === 'multi' ? (
