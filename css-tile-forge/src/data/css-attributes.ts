@@ -1,46 +1,135 @@
-
-import { CssAttribute } from './types';
+export interface CssAttribute {
+  id: string;
+  label: string;
+  category: string;
+  controlType: 'color' | 'slider' | 'select' | 'checkbox' | 'multi' | 'gradient';
+  defaultValue: any;
+  min?: number;
+  max?: number;
+  step?: number;
+  options?: { value: string; label: string }[];
+  subAttributes?: CssAttribute[];
+}
 
 export const CSS_ATTRIBUTES: CssAttribute[] = [
+  // Background
   {
     id: 'backgroundColor',
     label: 'Background Color',
     category: 'Background',
     controlType: 'color',
-    defaultValue: '#FFFFFF',
+    defaultValue: '#d3d3d3',
   },
   {
-    id: 'backgroundGradient',
+    id: 'backgroundImage',
     label: 'Background Gradient',
     category: 'Background',
     controlType: 'gradient',
     defaultValue: {
       type: 'linear',
       angle: 90,
-      colors: ['#FFFFFF', '#000000'],
+      colors: ['#ffffff', '#000000'],
     },
   },
+  
+  // Borders
+  {
+    id: 'border',
+    label: 'Border',
+    category: 'Border',
+    controlType: 'multi',
+    defaultValue: {
+      width: 2,
+      style: 'solid',
+      color: '#000000',
+    },
+    subAttributes: [
+      {
+        id: 'width',
+        label: 'Width',
+        category: 'Border',
+        controlType: 'slider',
+        defaultValue: 2,
+        min: 0,
+        max: 20,
+        step: 1,
+      },
+      {
+        id: 'style',
+        label: 'Style',
+        category: 'Border',
+        controlType: 'select',
+        defaultValue: 'solid',
+        options: [
+          { value: 'none', label: 'None' },
+          { value: 'solid', label: 'Solid' },
+          { value: 'dashed', label: 'Dashed' },
+          { value: 'dotted', label: 'Dotted' },
+          { value: 'double', label: 'Double' },
+        ],
+      },
+      {
+        id: 'color',
+        label: 'Color',
+        category: 'Border',
+        controlType: 'color',
+        defaultValue: '#000000',
+      },
+    ],
+  },
+  {
+    id: 'borderRadius',
+    label: 'Border Radius',
+    category: 'Border',
+    controlType: 'slider',
+    defaultValue: 0,
+    min: 0,
+    max: 50,
+    step: 1,
+  },
+  
+  // Individual borders
   {
     id: 'borderTop',
     label: 'Border Top',
     category: 'Border',
     controlType: 'multi',
     defaultValue: {
-      borderTopWidth: 1,
-      borderTopStyle: 'solid',
-      borderTopColor: '#000000',
-      borderTopRadius: 0,
+      width: 2,
+      style: 'solid',
+      color: '#000000',
     },
     subAttributes: [
-      { id: 'borderTopWidth', label: 'Width', controlType: 'slider', min: 0, max: 10, step: 1, defaultValue: 1 },
-      { id: 'borderTopStyle', label: 'Style', controlType: 'select', options: [
+      {
+        id: 'width',
+        label: 'Width',
+        category: 'Border',
+        controlType: 'slider',
+        defaultValue: 2,
+        min: 0,
+        max: 20,
+        step: 1,
+      },
+      {
+        id: 'style',
+        label: 'Style',
+        category: 'Border',
+        controlType: 'select',
+        defaultValue: 'solid',
+        options: [
           { value: 'none', label: 'None' },
           { value: 'solid', label: 'Solid' },
           { value: 'dashed', label: 'Dashed' },
           { value: 'dotted', label: 'Dotted' },
-        ], defaultValue: 'solid' },
-      { id: 'borderTopColor', label: 'Color', controlType: 'color', defaultValue: '#000000' },
-      { id: 'borderTopRadius', label: 'Radius', controlType: 'slider', min: 0, max: 50, step: 1, defaultValue: 0 },
+        ],
+      },
+      {
+        id: 'color',
+        label: 'Color',
+        category: 'Border',
+        controlType: 'color',
+        defaultValue: '#000000',
+      },
     ],
   },
   {
@@ -49,21 +138,41 @@ export const CSS_ATTRIBUTES: CssAttribute[] = [
     category: 'Border',
     controlType: 'multi',
     defaultValue: {
-      borderRightWidth: 1,
-      borderRightStyle: 'solid',
-      borderRightColor: '#000000',
-      borderRightRadius: 0,
+      width: 2,
+      style: 'solid',
+      color: '#000000',
     },
     subAttributes: [
-      { id: 'borderRightWidth', label: 'Width', controlType: 'slider', min: 0, max: 10, step: 1, defaultValue: 1 },
-      { id: 'borderRightStyle', label: 'Style', controlType: 'select', options: [
-        { value: 'none', label: 'None' },
-        { value: 'solid', label: 'Solid' },
-        { value: 'dashed', label: 'Dashed' },
-        { value: 'dotted', label: 'Dotted' },
-      ], defaultValue: 'solid' },
-      { id: 'borderRightColor', label: 'Color', controlType: 'color', defaultValue: '#000000' },
-      { id: 'borderRightRadius', label: 'Radius', controlType: 'slider', min: 0, max: 50, step: 1, defaultValue: 0 },
+      {
+        id: 'width',
+        label: 'Width',
+        category: 'Border',
+        controlType: 'slider',
+        defaultValue: 2,
+        min: 0,
+        max: 20,
+        step: 1,
+      },
+      {
+        id: 'style',
+        label: 'Style',
+        category: 'Border',
+        controlType: 'select',
+        defaultValue: 'solid',
+        options: [
+          { value: 'none', label: 'None' },
+          { value: 'solid', label: 'Solid' },
+          { value: 'dashed', label: 'Dashed' },
+          { value: 'dotted', label: 'Dotted' },
+        ],
+      },
+      {
+        id: 'color',
+        label: 'Color',
+        category: 'Border',
+        controlType: 'color',
+        defaultValue: '#000000',
+      },
     ],
   },
   {
@@ -72,21 +181,41 @@ export const CSS_ATTRIBUTES: CssAttribute[] = [
     category: 'Border',
     controlType: 'multi',
     defaultValue: {
-      borderBottomWidth: 1,
-      borderBottomStyle: 'solid',
-      borderBottomColor: '#000000',
-      borderBottomRadius: 0,
+      width: 2,
+      style: 'solid',
+      color: '#000000',
     },
     subAttributes: [
-      { id: 'borderBottomWidth', label: 'Width', controlType: 'slider', min: 0, max: 10, step: 1, defaultValue: 1 },
-      { id: 'borderBottomStyle', label: 'Style', controlType: 'select', options: [
-        { value: 'none', label: 'None' },
-        { value: 'solid', label: 'Solid' },
-        { value: 'dashed', label: 'Dashed' },
-        { value: 'dotted', label: 'Dotted' },
-      ], defaultValue: 'solid' },
-      { id: 'borderBottomColor', label: 'Color', controlType: 'color', defaultValue: '#000000' },
-      { id: 'borderBottomRadius', label: 'Radius', controlType: 'slider', min: 0, max: 50, step: 1, defaultValue: 0 },
+      {
+        id: 'width',
+        label: 'Width',
+        category: 'Border',
+        controlType: 'slider',
+        defaultValue: 2,
+        min: 0,
+        max: 20,
+        step: 1,
+      },
+      {
+        id: 'style',
+        label: 'Style',
+        category: 'Border',
+        controlType: 'select',
+        defaultValue: 'solid',
+        options: [
+          { value: 'none', label: 'None' },
+          { value: 'solid', label: 'Solid' },
+          { value: 'dashed', label: 'Dashed' },
+          { value: 'dotted', label: 'Dotted' },
+        ],
+      },
+      {
+        id: 'color',
+        label: 'Color',
+        category: 'Border',
+        controlType: 'color',
+        defaultValue: '#000000',
+      },
     ],
   },
   {
@@ -95,51 +224,119 @@ export const CSS_ATTRIBUTES: CssAttribute[] = [
     category: 'Border',
     controlType: 'multi',
     defaultValue: {
-      borderLeftWidth: 1,
-      borderLeftStyle: 'solid',
-      borderLeftColor: '#000000',
-      borderLeftRadius: 0,
+      width: 2,
+      style: 'solid',
+      color: '#000000',
     },
     subAttributes: [
-      { id: 'borderLeftWidth', label: 'Width', controlType: 'slider', min: 0, max: 10, step: 1, defaultValue: 1 },
-      { id: 'borderLeftStyle', label: 'Style', controlType: 'select', options: [
-        { value: 'none', label: 'None' },
-        { value: 'solid', label: 'Solid' },
-        { value: 'dashed', label: 'Dashed' },
-        { value: 'dotted', label: 'Dotted' },
-      ], defaultValue: 'solid' },
-      { id: 'borderLeftColor', label: 'Color', controlType: 'color', defaultValue: '#000000' },
-      { id: 'borderLeftRadius', label: 'Radius', controlType: 'slider', min: 0, max: 50, step: 1, defaultValue: 0 },
+      {
+        id: 'width',
+        label: 'Width',
+        category: 'Border',
+        controlType: 'slider',
+        defaultValue: 2,
+        min: 0,
+        max: 20,
+        step: 1,
+      },
+      {
+        id: 'style',
+        label: 'Style',
+        category: 'Border',
+        controlType: 'select',
+        defaultValue: 'solid',
+        options: [
+          { value: 'none', label: 'None' },
+          { value: 'solid', label: 'Solid' },
+          { value: 'dashed', label: 'Dashed' },
+          { value: 'dotted', label: 'Dotted' },
+        ],
+      },
+      {
+        id: 'color',
+        label: 'Color',
+        category: 'Border',
+        controlType: 'color',
+        defaultValue: '#000000',
+      },
     ],
+  },
+  
+  // Layout
+  {
+    id: 'opacity',
+    label: 'Opacity',
+    category: 'Effects',
+    controlType: 'slider',
+    defaultValue: 1,
+    min: 0,
+    max: 1,
+    step: 0.1,
   },
   {
-    id: 'filter',
-    label: 'Filter Effects',
-    category: 'Filter',
+    id: 'boxShadow',
+    label: 'Box Shadow',
+    category: 'Effects',
     controlType: 'multi',
     defaultValue: {
+      x: 0,
+      y: 0,
       blur: 0,
-      brightness: 1,
-      contrast: 1,
-      grayscale: 0,
-      hueRotate: 0,
-      invert: 0,
-      opacity: 1,
-      saturate: 1,
-      sepia: 0,
+      spread: 0,
+      color: '#000000',
     },
     subAttributes: [
-      { id: 'blur', label: 'Blur (px)', controlType: 'slider', min: 0, max: 20, step: 0.1, defaultValue: 0 },
-      { id: 'brightness', label: 'Brightness', controlType: 'slider', min: 0, max: 2, step: 0.01, defaultValue: 1 },
-      { id: 'contrast', label: 'Contrast', controlType: 'slider', min: 0, max: 2, step: 0.01, defaultValue: 1 },
-      { id: 'grayscale', label: 'Grayscale', controlType: 'slider', min: 0, max: 1, step: 0.01, defaultValue: 0 },
-      { id: 'hueRotate', label: 'Hue Rotate (deg)', controlType: 'slider', min: 0, max: 360, step: 1, defaultValue: 0 },
-      { id: 'invert', label: 'Invert', controlType: 'slider', min: 0, max: 1, step: 0.01, defaultValue: 0 },
-      { id: 'opacity', label: 'Opacity', controlType: 'slider', min: 0, max: 1, step: 0.01, defaultValue: 1 },
-      { id: 'saturate', label: 'Saturate', controlType: 'slider', min: 0, max: 3, step: 0.01, defaultValue: 1 },
-      { id: 'sepia', label: 'Sepia', controlType: 'slider', min: 0, max: 1, step: 0.01, defaultValue: 0 },
+      {
+        id: 'x',
+        label: 'X Offset',
+        category: 'Effects',
+        controlType: 'slider',
+        defaultValue: 0,
+        min: -20,
+        max: 20,
+        step: 1,
+      },
+      {
+        id: 'y',
+        label: 'Y Offset',
+        category: 'Effects',
+        controlType: 'slider',
+        defaultValue: 0,
+        min: -20,
+        max: 20,
+        step: 1,
+      },
+      {
+        id: 'blur',
+        label: 'Blur',
+        category: 'Effects',
+        controlType: 'slider',
+        defaultValue: 0,
+        min: 0,
+        max: 20,
+        step: 1,
+      },
+      {
+        id: 'spread',
+        label: 'Spread',
+        category: 'Effects',
+        controlType: 'slider',
+        defaultValue: 0,
+        min: -10,
+        max: 10,
+        step: 1,
+      },
+      {
+        id: 'color',
+        label: 'Color',
+        category: 'Effects',
+        controlType: 'color',
+        defaultValue: '#000000',
+      },
     ],
   },
+  
+  // Transform
   {
     id: 'transform',
     label: 'Transform',
@@ -153,25 +350,156 @@ export const CSS_ATTRIBUTES: CssAttribute[] = [
       scaleY: 1,
     },
     subAttributes: [
-      { id: 'translateX', label: 'Translate X (px)', controlType: 'slider', min: -100, max: 100, step: 1, defaultValue: 0 },
-      { id: 'translateY', label: 'Translate Y (px)', controlType: 'slider', min: -100, max: 100, step: 1, defaultValue: 0 },
-      { id: 'rotate', label: 'Rotate (deg)', controlType: 'slider', min: 0, max: 360, step: 1, defaultValue: 0 },
-      { id: 'scaleX', label: 'Scale X', controlType: 'slider', min: 0, max: 5, step: 0.01, defaultValue: 1 },
-      { id: 'scaleY', label: 'Scale Y', controlType: 'slider', min: 0, max: 5, step: 0.01, defaultValue: 1 },
+      {
+        id: 'translateX',
+        label: 'Translate X',
+        category: 'Transform',
+        controlType: 'slider',
+        defaultValue: 0,
+        min: -50,
+        max: 50,
+        step: 1,
+      },
+      {
+        id: 'translateY',
+        label: 'Translate Y',
+        category: 'Transform',
+        controlType: 'slider',
+        defaultValue: 0,
+        min: -50,
+        max: 50,
+        step: 1,
+      },
+      {
+        id: 'rotate',
+        label: 'Rotate',
+        category: 'Transform',
+        controlType: 'slider',
+        defaultValue: 0,
+        min: 0,
+        max: 360,
+        step: 1,
+      },
+      {
+        id: 'scaleX',
+        label: 'Scale X',
+        category: 'Transform',
+        controlType: 'slider',
+        defaultValue: 1,
+        min: 0.1,
+        max: 3,
+        step: 0.1,
+      },
+      {
+        id: 'scaleY',
+        label: 'Scale Y',
+        category: 'Transform',
+        controlType: 'slider',
+        defaultValue: 1,
+        min: 0.1,
+        max: 3,
+        step: 0.1,
+      },
+    ],
+  },
+
+  // Filter effects
+  {
+    id: 'filter',
+    label: 'Filter Effects',
+    category: 'Effects',
+    controlType: 'multi',
+    defaultValue: {
+      blur: 0,
+      brightness: 1,
+      contrast: 1,
+      grayscale: 0,
+      hueRotate: 0,
+      invert: 0,
+      saturate: 1,
+      sepia: 0,
+    },
+    subAttributes: [
+      {
+        id: 'blur',
+        label: 'Blur',
+        category: 'Effects',
+        controlType: 'slider',
+        defaultValue: 0,
+        min: 0,
+        max: 10,
+        step: 0.1,
+      },
+      {
+        id: 'brightness',
+        label: 'Brightness',
+        category: 'Effects',
+        controlType: 'slider',
+        defaultValue: 1,
+        min: 0,
+        max: 3,
+        step: 0.1,
+      },
+      {
+        id: 'contrast',
+        label: 'Contrast',
+        category: 'Effects',
+        controlType: 'slider',
+        defaultValue: 1,
+        min: 0,
+        max: 3,
+        step: 0.1,
+      },
+      {
+        id: 'grayscale',
+        label: 'Grayscale',
+        category: 'Effects',
+        controlType: 'slider',
+        defaultValue: 0,
+        min: 0,
+        max: 1,
+        step: 0.1,
+      },
+      {
+        id: 'hueRotate',
+        label: 'Hue Rotate',
+        category: 'Effects',
+        controlType: 'slider',
+        defaultValue: 0,
+        min: 0,
+        max: 360,
+        step: 1,
+      },
+      {
+        id: 'invert',
+        label: 'Invert',
+        category: 'Effects',
+        controlType: 'slider',
+        defaultValue: 0,
+        min: 0,
+        max: 1,
+        step: 0.1,
+      },
+      {
+        id: 'saturate',
+        label: 'Saturate',
+        category: 'Effects',
+        controlType: 'slider',
+        defaultValue: 1,
+        min: 0,
+        max: 3,
+        step: 0.1,
+      },
+      {
+        id: 'sepia',
+        label: 'Sepia',
+        category: 'Effects',
+        controlType: 'slider',
+        defaultValue: 0,
+        min: 0,
+        max: 1,
+        step: 0.1,
+      },
     ],
   },
 ];
-
-// We can define a separate type definition file if it becomes complex.
-export interface CssAttribute {
-  id: string;
-  label: string;
-  category: string;
-  controlType: 'color' | 'slider' | 'select' | 'text' | 'multi' | 'gradient' | 'checkbox' | 'button';
-  defaultValue: any;
-  options?: { value: string; label: string }[];
-  min?: number;
-  max?: number;
-  step?: number;
-  subAttributes?: Omit<CssAttribute, 'category' | 'subAttributes'>[];
-}
