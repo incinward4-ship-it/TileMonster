@@ -1,5 +1,6 @@
 import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
 import { TileStyle } from '../../data/types';
+import { buildCompleteStyle } from '../../utils/styleHelpers';
 
 interface SandboxProps {
   palette: TileStyle[];
@@ -28,7 +29,6 @@ const Sandbox: React.FC<SandboxProps> = ({
   const [gridDimensions, setGridDimensions] = useState({ rows: grid.length || 16, cols: grid[0]?.length || 16 });
   const gridContainerRef = useRef<HTMLDivElement>(null);
 
-  // Effect for dynamically resizing the grid based on container size and zoom
   useLayoutEffect(() => {
     const updateGridSize = () => {
       if (gridContainerRef.current) {
@@ -41,7 +41,6 @@ const Sandbox: React.FC<SandboxProps> = ({
         if (newRows !== gridDimensions.rows || newCols !== gridDimensions.cols) {
           setGridDimensions({ rows: newRows, cols: newCols });
 
-          // Resize grid data, preserving existing painted cells
           const newGrid = Array.from({ length: newRows }, (_, r) =>
             Array.from({ length: newCols }, (_, c) => {
               return r < grid.length && c < (grid[0]?.length || 0) && grid[r] ? grid[r][c] : null;
@@ -52,7 +51,7 @@ const Sandbox: React.FC<SandboxProps> = ({
       }
     };
 
-    updateGridSize(); // Initial calculation
+    updateGridSize();
 
     const resizeObserver = new ResizeObserver(updateGridSize);
     if (gridContainerRef.current) {
@@ -60,14 +59,10 @@ const Sandbox: React.FC<SandboxProps> = ({
     }
 
     return () => resizeObserver.disconnect();
-  }, [zoomLevel, showGridLines, setGrid, gridDimensions.cols, gridDimensions.rows, grid]);
+  }, [zoomLevel, showGridLines, setGrid, grid.length, grid[0]?.length]);
     
-  // Effect to ensure component re-renders when grid or palette data changes, which is crucial for updating blend effects
   useEffect(() => {
-    // The purpose of this effect is to acknowledge that grid and palette are dependencies for rendering.
-    // React's render cycle will handle the rest, as getCellStyle is called on every render.
   }, [grid, palette]);
-
 
   const handleMouseDown = (rowIndex: number, cellIndex: number) => {
     setIsPainting(true);
@@ -92,11 +87,10 @@ const Sandbox: React.FC<SandboxProps> = ({
       return { ...baseStyle, backgroundColor: '#ddd' };
     }
     
-    // Copy the style to avoid mutating the original palette object
-    const tileStyle = { ...palette[paletteIndex] };
+    const rawTileStyle = palette[paletteIndex];
+    const completeTileStyle = buildCompleteStyle(rawTileStyle);
 
-    // Apply blending logic if the tile has blend mode enabled
-    if (tileStyle.blend) {
+    if (rawTileStyle.blend) {
         const { rows, cols } = gridDimensions;
         const isSameTile = (r: number, c: number) => grid[r]?.[c] === paletteIndex;
 
@@ -105,36 +99,20 @@ const Sandbox: React.FC<SandboxProps> = ({
         const hasLeft = cellIndex > 0 && isSameTile(rowIndex, cellIndex - 1);
         const hasRight = cellIndex < cols - 1 && isSameTile(rowIndex, cellIndex + 1);
 
-        // Remove borders on connecting sides
-        if (hasTop) {
-            tileStyle.borderTopWidth = 0;
-            tileStyle.borderTopStyle = 'none';
-        }
-        if (hasBottom) {
-            tileStyle.borderBottomWidth = 0;
-            tileStyle.borderBottomStyle = 'none';
-        }
-        if (hasLeft) {
-            tileStyle.borderLeftWidth = 0;
-            tileStyle.borderLeftStyle = 'none';
-        }
-        if (hasRight) {
-            tileStyle.borderRightWidth = 0;
-            tileStyle.borderRightStyle = 'none';
-        }
+        if (hasTop) completeTileStyle.borderTop = 'none';
+        if (hasBottom) completeTileStyle.borderBottom = 'none';
+        if (hasLeft) completeTileStyle.borderLeft = 'none';
+        if (hasRight) completeTileStyle.borderRight = 'none';
         
-        // Remove corner radii where tiles meet
-        if (hasTop || hasLeft) tileStyle.borderTopLeftRadius = 0;
-        if (hasTop || hasRight) tileStyle.borderTopRightRadius = 0;
-        if (hasBottom || hasLeft) tileStyle.borderBottomLeftRadius = 0;
-        if (hasBottom || hasRight) tileStyle.borderBottomRightRadius = 0;
+        if (hasTop || hasLeft) completeTileStyle.borderTopLeftRadius = 0;
+        if (hasTop || hasRight) completeTileStyle.borderTopRightRadius = 0;
+        if (hasBottom || hasLeft) completeTileStyle.borderBottomLeftRadius = 0;
+        if (hasBottom || hasRight) completeTileStyle.borderBottomRightRadius = 0;
     }
 
-
-    return { ...baseStyle, ...tileStyle };
+    return { ...baseStyle, ...completeTileStyle };
   };
 
-  // Generate grid cells array for rendering
   const generateGridCells = () => {
     const cells = [];
     for (let row = 0; row < gridDimensions.rows; row++) {

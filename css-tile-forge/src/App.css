@@ -22,6 +22,13 @@ body {
   user-select: none;
 }
 
+.app-title {
+  font-family: 'Creepster', cursive;
+  font-size: 3rem;
+  color: #f7c84c;
+  text-shadow: 2px 2px 4px #000;
+}
+
 .large-logo-tile {
     width: 60px;
     height: 60px;
@@ -441,4 +448,17 @@ input[type="number"] {
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 12px;
+}
+
+.blinking-eye {
+  animation: blink 3s infinite;
+}
+
+@keyframes blink {
+  0%, 100% {
+    box-shadow: 0 0 10px 0px rgba(247, 200, 76, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 20px 10px rgba(247, 200, 76, 0.7);
+  }
 }
