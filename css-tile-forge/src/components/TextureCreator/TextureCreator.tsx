@@ -1,4 +1,3 @@
-
 import React from 'react';
 import AttributePanel from '../AttributePanel/AttributePanel';
 import { ActiveAttribute, TileStyle } from '../../data/types';
@@ -93,10 +92,10 @@ const TextureCreator: React.FC<TextureCreatorProps> = ({
     <div className="texture-creator">
       <h2>Texture Creator</h2>
       <div className="controls" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <button onClick={clearAll}>Clear All</button>
-        <button onClick={handleRandomize}>Randomize One</button>
-        <button onClick={randomizeAllAttributes}>Randomize All</button>
-        <button onClick={() => saveToPalette(tileStyles)}>Save to Palette</button>
+        <button className='side-button' onClick={clearAll}>Clear All</button>
+        <button className='side-button' onClick={handleRandomize}>Randomize One</button>
+        <button className='side-button' onClick={randomizeAllAttributes}>Randomize All</button>
+        <button className='side-button' onClick={() => saveToPalette(tileStyles)}>Save to Palette</button>
       </div>
       <AttributePanel
         attributes={activeAttributes}

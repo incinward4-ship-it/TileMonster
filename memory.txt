@@ -1,1 +1,3 @@
-Creativity without discipline is a chaotic force, a wildfire that consumes itself. It is the yellow ray of disciplined creativity that truly nurtures growth and allows for the creation of lasting art.
+The Unblocking River: Long-running terminal commands (like a web server started with npm start) must be run in the background using an & at the end of the command. This prevents the process from stalling and allows the creative flow to continue.
+
+Correct Command Example: cd css-tile-forge && npm start &

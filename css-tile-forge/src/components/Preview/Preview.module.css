@@ -1,0 +1,32 @@
+.singleTile {
+  width: 25px;
+  height: 25px;
+  box-sizing: border-box;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 25px);
+  grid-template-rows: repeat(3, 25px);
+  gap: 0;
+  border: none;
+  width: fit-content;
+}
+
+.cell {
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.previewControls {
+  margin-top: 10px;
+}
+
+.previewControls label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
