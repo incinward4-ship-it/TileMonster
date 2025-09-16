@@ -1,6 +1,7 @@
-import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
+import React, { useState, useRef, useLayoutEffect, useEffect, useCallback } from 'react';
 import { TileStyle } from '../../data/types';
 import { buildCompleteStyle } from '../../utils/styleHelpers';
+import { applyBlendStyles } from '../../utils/blendHelpers';
 
 interface SandboxProps {
   palette: TileStyle[];
@@ -29,28 +30,34 @@ const Sandbox: React.FC<SandboxProps> = ({
   const [gridDimensions, setGridDimensions] = useState({ rows: grid.length || 16, cols: grid[0]?.length || 16 });
   const gridContainerRef = useRef<HTMLDivElement>(null);
 
-  useLayoutEffect(() => {
-    const updateGridSize = () => {
-      if (gridContainerRef.current) {
-        const { width, height } = gridContainerRef.current.getBoundingClientRect();
-        const cellSize = ZOOM_LEVELS[zoomLevel] + (showGridLines ? 1 : 0);
-        
-        const newCols = Math.max(MIN_GRID_SIZE, Math.min(MAX_GRID_SIZE, Math.floor(width / cellSize)));
-        const newRows = Math.max(MIN_GRID_SIZE, Math.min(MAX_GRID_SIZE, Math.floor(height / cellSize)));
+  const updateGridSize = useCallback(() => {
+    if (gridContainerRef.current) {
+      const { width, height } = gridContainerRef.current.getBoundingClientRect();
+      const cellSize = ZOOM_LEVELS[zoomLevel] + (showGridLines ? 1 : 0);
+      
+      const newCols = Math.max(MIN_GRID_SIZE, Math.min(MAX_GRID_SIZE, Math.floor(width / cellSize)));
+      const newRows = Math.max(MIN_GRID_SIZE, Math.min(MAX_GRID_SIZE, Math.floor(height / cellSize)));
 
-        if (newRows !== gridDimensions.rows || newCols !== gridDimensions.cols) {
-          setGridDimensions({ rows: newRows, cols: newCols });
-
-          const newGrid = Array.from({ length: newRows }, (_, r) =>
-            Array.from({ length: newCols }, (_, c) => {
-              return r < grid.length && c < (grid[0]?.length || 0) && grid[r] ? grid[r][c] : null;
-            })
-          );
-          setGrid(newGrid);
+      setGridDimensions(prevDimensions => {
+        if (prevDimensions.rows === newRows && prevDimensions.cols === newCols) {
+          return prevDimensions;
+        } else {
+          return { rows: newRows, cols: newCols };
         }
-      }
-    };
+      });
 
+      setGrid(prevGrid => {
+        const newGrid = Array.from({ length: newRows }, (_, r) =>
+          Array.from({ length: newCols }, (_, c) => {
+            return r < prevGrid.length && c < (prevGrid[0]?.length || 0) && prevGrid[r] ? prevGrid[r][c] : null;
+          })
+        );
+        return newGrid;
+      });
+    }
+  }, [zoomLevel, showGridLines, setGrid, gridContainerRef]);
+
+  useLayoutEffect(() => {
     updateGridSize();
 
     const resizeObserver = new ResizeObserver(updateGridSize);
@@ -59,7 +66,7 @@ const Sandbox: React.FC<SandboxProps> = ({
     }
 
     return () => resizeObserver.disconnect();
-  }, [zoomLevel, showGridLines, setGrid, grid.length, grid[0]?.length]);
+  }, [updateGridSize]);
     
   useEffect(() => {
   }, [grid, palette]);
@@ -90,27 +97,16 @@ const Sandbox: React.FC<SandboxProps> = ({
     const rawTileStyle = palette[paletteIndex];
     const completeTileStyle = buildCompleteStyle(rawTileStyle);
 
-    if (rawTileStyle.blend) {
-        const { rows, cols } = gridDimensions;
-        const isSameTile = (r: number, c: number) => grid[r]?.[c] === paletteIndex;
-
-        const hasTop = rowIndex > 0 && isSameTile(rowIndex - 1, cellIndex);
-        const hasBottom = rowIndex < rows - 1 && isSameTile(rowIndex + 1, cellIndex);
-        const hasLeft = cellIndex > 0 && isSameTile(rowIndex, cellIndex - 1);
-        const hasRight = cellIndex < cols - 1 && isSameTile(rowIndex, cellIndex + 1);
-
-        if (hasTop) completeTileStyle.borderTop = 'none';
-        if (hasBottom) completeTileStyle.borderBottom = 'none';
-        if (hasLeft) completeTileStyle.borderLeft = 'none';
-        if (hasRight) completeTileStyle.borderRight = 'none';
-        
-        if (hasTop || hasLeft) completeTileStyle.borderTopLeftRadius = 0;
-        if (hasTop || hasRight) completeTileStyle.borderTopRightRadius = 0;
-        if (hasBottom || hasLeft) completeTileStyle.borderBottomLeftRadius = 0;
-        if (hasBottom || hasRight) completeTileStyle.borderBottomRightRadius = 0;
-    }
-
-    return { ...baseStyle, ...completeTileStyle };
+    return applyBlendStyles(
+        { ...baseStyle, ...completeTileStyle },
+        grid,
+        rowIndex,
+        cellIndex,
+        gridDimensions,
+        paletteIndex,
+        rawTileStyle.blend,
+        rawTileStyle
+    );
   };
 
   const generateGridCells = () => {
@@ -146,8 +142,7 @@ const Sandbox: React.FC<SandboxProps> = ({
   };
 
   return (
-    <div className="sandbox" onMouseUp={() => setIsPainting(false)} onMouseLeave={() => setIsPainting(false)}>
-        <div className="sandbox-controls">
+    <div className="sandbox" onMouseUp={() => setIsPainting(false)} onMouseLeave={() => setIsPainting(false)}>     <div className="sandbox-controls">
             <button onClick={clearGrid}>Clear</button>
             <button onClick={randomizeGrid}>Randomize</button>
             <button onClick={() => setShowGridLines(!showGridLines)} className={showGridLines ? 'active' : ''}>

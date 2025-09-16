@@ -23,17 +23,17 @@ const StylePalette: React.FC<StylePaletteProps> = ({
 }) => {
   const handleTileClick = (index: number) => {
     const currentIndex = selectedStyleIndices.indexOf(index);
+
     let newSelected: number[];
 
     if (currentIndex === -1) {
-      if (selectedStyleIndices.length < 2) {
-        newSelected = [...selectedStyleIndices, index];
-      } else {
-        newSelected = [selectedStyleIndices[1], index];
-      }
+      // Add the index to the selected styles
+      newSelected = [...selectedStyleIndices, index];
     } else {
+      // Remove the index from the selected styles
       newSelected = selectedStyleIndices.filter(i => i !== index);
     }
+
     setSelectedStyleIndices(newSelected);
   };
 
@@ -54,6 +54,7 @@ const StylePalette: React.FC<StylePaletteProps> = ({
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
         <h3>Style Palette ({palette.length})</h3>
         <button
+          className='palette-action-button'
           onClick={onUpdate}
           disabled={selectedStyleIndices.length !== 1}
           title="Update selected style (requires 1 style)"
@@ -61,6 +62,7 @@ const StylePalette: React.FC<StylePaletteProps> = ({
           Update
         </button>
         <button
+         className='palette-action-button'
           onClick={onEvolve}
           disabled={selectedStyleIndices.length !== 2}
           title="Evolve selected styles (requires 2 styles)"
@@ -68,10 +70,10 @@ const StylePalette: React.FC<StylePaletteProps> = ({
           Evolve
         </button>
         <button
+          className='palette-action-button'
           onClick={onDelete}
           disabled={selectedStyleIndices.length === 0}
           title="Delete selected styles"
-          style={{ backgroundColor: '#dc3545', color: 'white' }}
         >
           Delete
         </button>
@@ -84,6 +86,7 @@ const StylePalette: React.FC<StylePaletteProps> = ({
           
           return (
             <button
+              className="palette-tile"
               key={index}
               onClick={() => handleTileClick(index)}
               style={{

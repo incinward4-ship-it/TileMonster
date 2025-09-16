@@ -60,6 +60,7 @@ export function buildGradientString(gradientVal: any): string {
 
 export const buildCompleteStyle = (tileStyle: TileStyle): React.CSSProperties => {
     const newStyles: React.CSSProperties = {};
+    let borderRadius: string | undefined = undefined;
     for (const key in tileStyle) {
         const value = tileStyle[key as keyof TileStyle];
         if (value === undefined || value === null) continue;
@@ -84,7 +85,7 @@ export const buildCompleteStyle = (tileStyle: TileStyle): React.CSSProperties =>
                 }
                 break;
             case 'borderRadius':
-                newStyles.borderRadius = `${value}px`;
+                borderRadius = `${value}px`;
                 break;
             case 'opacity':
                 newStyles.opacity = value as number;
@@ -112,6 +113,9 @@ export const buildCompleteStyle = (tileStyle: TileStyle): React.CSSProperties =>
                 }
                 break;
         }
+    }
+    if (borderRadius) {
+        newStyles.borderRadius = borderRadius;
     }
     return newStyles;
 };

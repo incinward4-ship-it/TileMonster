@@ -1,0 +1,11 @@
+.container {
+  display: flex;
+}
+
+.texturePaletteContainer {
+  width: 300px;
+}
+
+.sandboxExportContainer {
+  flex: 1;
+}
